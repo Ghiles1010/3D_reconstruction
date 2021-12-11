@@ -5,11 +5,11 @@ from numpy import genfromtxt
 import numpy as np
 import cv2
 
-LIGHT_SOURCE = "dataset/light_directions.txt"
-LIGHT_INTENSITY = "dataset/light_intensities.txt"
-MASK = "dataset/mask.png"
-FILE_NAMES = "dataset/filenames.txt"
-IMAGES_PATH = "dataset/"
+LIGHT_SOURCE = "light_directions.txt"
+LIGHT_INTENSITY = "light_intensities.txt"
+MASK = "mask.png"
+FILE_NAMES = "filenames.txt"
+PATH = "dataset/"
 
 TREATED_IMAGES_DIR = "treated_images/"
 TREATED_IMAGES_FILE = "treated_images/new_images.npy"
@@ -17,13 +17,13 @@ PIXELS_COORDS_PATH = "treated_images/pixels_coords.txt"
 
 
 def load_light_source():
-	return np.genfromtxt(LIGHT_SOURCE, delimiter=' ')
+	return np.genfromtxt(get_path(LIGHT_SOURCE), delimiter=' ')
 
 def load_light_intensity():
-	return np.genfromtxt(LIGHT_INTENSITY, delimiter=' ')
+	return np.genfromtxt(get_path(LIGHT_INTENSITY), delimiter=' ')
 
 def load_mask():
-	return cv2.imread(MASK, cv2.IMREAD_UNCHANGED)
+	return cv2.imread(get_path(MASK), cv2.IMREAD_UNCHANGED)
 
 def get_concerened_pixels(mask):
 	return list(zip(*np.where(mask!=0)))
@@ -44,10 +44,18 @@ def crop(image, dims):
 def RGB2BGR(pixel):
 	return pixel[::-1]
 
+def get_path(file):
+	global PATH
+	return os.path.join(PATH, file)
+
+def menu():
+	global PATH
+	PATH = input("Entrez le path du dossier \"dataset\" : ")
+
 
 def load_images():
 
-	
+	menu()
 
 	if os.path.isfile(TREATED_IMAGES_FILE) :
 
@@ -65,11 +73,11 @@ def load_images():
 	else :
 
 		images = []
-		with open(FILE_NAMES) as file:
+		with open(get_path(FILE_NAMES)) as file:
 			file_names = file.read().rstrip().split("\n")
 
 		for file in file_names:
-			img = cv2.imread(IMAGES_PATH + file, cv2.IMREAD_UNCHANGED)
+			img = cv2.imread(get_path(file), cv2.IMREAD_UNCHANGED)
 			img = img / 65535.0
 			images.append(img)
 
@@ -138,6 +146,9 @@ def get_normal():
 	normals = calculate_normal(images, pixels_coords)
 	mask = load_mask()
 	return pixels_coords, mask, normals
+
+
+
 
 
 def main():
