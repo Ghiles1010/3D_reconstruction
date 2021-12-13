@@ -22,6 +22,11 @@ def next_z_move_x(z_origin, normal, l=0.5):
 	z = z_origin + z
 	return z
 
+def add_point(i, j, z, colors, points, normals):
+	new_point = np.array([i, j, z])
+	colors.append(clc.get_grey_pixel(normals[i,j]))
+	points.append(new_point)
+
 
 def create_3d_model():
 	pixel_coords, mask, normals = clc.get_normal()
@@ -35,16 +40,20 @@ def create_3d_model():
 
 	points, colors = [], []
 
-	
 	for i in range(0, h, step):
-		z_origin = 0
+		first_in_row = True
 		for j in range(0, w, step):
 			if mask[i,j] != 0 :
-				z = next_z_move_x(z_origin, normals[i,j], step)
-				new_point = np.array([i, j, z])
-				points.append(new_point)
+
+				if first_in_row :
+					first_in_row, z = False, 0
+					add_point(i, j, z, colors, points, normals)
+
+				else:
+					z = next_z_move_x(z_origin, normals[i,j-step], step)
+					add_point(i, j, z, colors, points, normals)
+
 				z_origin = z
-				colors.append(clc.get_grey_pixel(normals[i,j]))
 
 
 	fig = plt.figure()
