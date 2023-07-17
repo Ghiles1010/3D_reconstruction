@@ -7,7 +7,7 @@ import calculate as clc
 import operations as op
 import cv2
 from copy import copy
-
+import sys
 
 
 def next_z_move_x(z_origin, normal, l=0.5):
@@ -28,8 +28,8 @@ def add_point(i, j, z, colors, points, normals):
 	points.append(new_point)
 
 
-def create_3d_model():
-	pixel_coords, mask, normals = clc.get_normal()
+def create_3d_model(test):
+	pixel_coords, mask, normals = clc.get_normal(test)
 	crop_dims = clc.get_mask_info(mask)
 
 	mask = clc.crop(mask, crop_dims)
@@ -70,9 +70,14 @@ def create_3d_model():
 
 
 def main():
-	create_3d_model()
+
+	test = True if len(sys.argv) == 2 and sys.argv[1] == 't' else False
+
+	create_3d_model(test)
 
 
 if __name__ == '__main__':
+
+	
 	main()
 	

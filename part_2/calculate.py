@@ -53,11 +53,11 @@ def menu():
 	PATH = input("Entrez le path du dossier \"dataset\" : ")
 
 
-def load_images():
+def load_images(test):
 
 	menu()
 
-	if os.path.isfile(TREATED_IMAGES_FILE) :
+	if test and os.path.isfile(TREATED_IMAGES_FILE) :
 
 		images = np.load(TREATED_IMAGES_FILE)
 		pixels_coords = []
@@ -102,16 +102,16 @@ def load_images():
 		new_images.append(new_image)
 		printProgressBar(idx+1, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
-	
-	os.makedirs(os.path.dirname(TREATED_IMAGES_DIR), exist_ok=True)
+	if test : 
+		os.makedirs(os.path.dirname(TREATED_IMAGES_DIR), exist_ok=True)
 
-	new_images = np.array(new_images)
+		new_images = np.array(new_images)
 
-	np.save(TREATED_IMAGES_FILE, new_images)
+		np.save(TREATED_IMAGES_FILE, new_images)
 
-	with open(PIXELS_COORDS_PATH, 'w') as file:
-		for i, j in pixels_coords:
-			file.write("{i},{j}\n".format(i=i, j=j))
+		with open(PIXELS_COORDS_PATH, 'w') as file:
+			for i, j in pixels_coords:
+				file.write("{i},{j}\n".format(i=i, j=j))
 
 
 	return np.array(new_images), pixels_coords
@@ -141,8 +141,8 @@ def calculate_normal(images, pixels_coords):
 
 
 
-def get_normal():
-	images, pixels_coords = load_images()
+def get_normal(test):
+	images, pixels_coords = load_images(test)
 	normals = calculate_normal(images, pixels_coords)
 	mask = load_mask()
 	return pixels_coords, mask, normals
@@ -162,11 +162,11 @@ def main():
 
 if __name__ == "__main__":
 
-	_,mask,_ = get_normal()
+	_,mask, normals = get_normal(False)
 
 	dims = get_mask_info(mask)
 	mask = crop(mask, dims)
 
-	cv2.imshow("", mask)
+	cv2.imshow("", normals)
 	cv2.waitKey(0)
 	#main()
